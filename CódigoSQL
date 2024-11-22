@@ -1,0 +1,181 @@
+
+create database bancomalvader;
+use bancomalvader;
+CREATE TABLE usuario (
+    id_usuario INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(100),
+    cpf VARCHAR(11),
+    data_nascimento DATE,
+    telefone VARCHAR(15),
+    tipo_usuario ENUM('FUNCIONARIO', 'CLIENTE'),
+    senha VARCHAR(50)
+);
+
+CREATE TABLE funcionario (
+    id_funcionario INT PRIMARY KEY AUTO_INCREMENT,
+    codigo_funcionario VARCHAR(20),
+    cargo VARCHAR(50),
+    id_usuario INT,
+    FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario)
+);
+
+CREATE TABLE cliente (
+    id_cliente INT PRIMARY KEY AUTO_INCREMENT,
+    id_usuario INT,
+    FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario)
+);
+
+CREATE TABLE endereco (
+    id_endereco INT PRIMARY KEY AUTO_INCREMENT,
+    cep VARCHAR(10),
+    local VARCHAR(100),
+    numero_casa INT,
+    bairro VARCHAR(50),
+    cidade VARCHAR(50),
+    estado VARCHAR(2),
+    id_usuario INT,
+    FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario)
+);
+
+CREATE TABLE conta (
+    id_conta INT PRIMARY KEY AUTO_INCREMENT,
+    numero_conta VARCHAR(20),
+    agencia VARCHAR(10),
+    saldo DECIMAL(15, 2),
+    tipo_conta ENUM('POUPANCA', 'CORRENTE'),
+    id_cliente INT,
+    FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente)
+);
+
+CREATE TABLE conta_corrente (
+    id_conta_corrente INT PRIMARY KEY AUTO_INCREMENT,
+    limite DECIMAL(15, 2),
+    data_vencimento DATE,
+    id_conta INT,
+    FOREIGN KEY (id_conta) REFERENCES conta(id_conta)
+);
+
+CREATE TABLE conta_poupanca (
+    id_conta_poupanca INT PRIMARY KEY AUTO_INCREMENT,
+    taxa_rendimento DECIMAL(5, 2),
+    id_conta INT,
+    FOREIGN KEY (id_conta) REFERENCES conta(id_conta)
+);
+
+CREATE TABLE transacao (
+    id_transacao INT PRIMARY KEY AUTO_INCREMENT,
+    tipo_transacao ENUM('DEPOSITO', 'SAQUE', 'TRANSFERENCIA'),
+    valor DECIMAL(15, 2),
+    data_hora TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    id_conta INT,
+    FOREIGN KEY (id_conta) REFERENCES conta(id_conta)
+);
+
+CREATE TABLE relatorio (
+    id_relatorio INT PRIMARY KEY AUTO_INCREMENT,
+    tipo_relatorio VARCHAR(50),
+    data_geracao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    conteudo TEXT,
+    id_funcionario INT,
+    FOREIGN KEY (id_funcionario) REFERENCES funcionario(id_funcionario)
+);
+
+CREATE TABLE usuario_tipo (
+    cpf VARCHAR(14) PRIMARY KEY,
+    senha VARCHAR(255) NOT NULL,
+    tipo VARCHAR(20) NOT NULL 
+);
+
+
+insert into usuario_tipo ( cpf, senha, tipo) values
+('12345678901', 'senha123', 'FUNCIONARIO'),
+('98765432100', 'senha456', 'CLIENTE' ),
+('11122233344', 'senha789', 'CLIENTE');
+
+
+INSERT INTO usuario (nome, cpf, data_nascimento, telefone, tipo_usuario, senha)
+VALUES ('Carlos Alberto', '12345678000', '1980-01-01', '11999999999', 'ADMINISTRADOR', 'admin123');
+
+
+INSERT INTO usuario (nome, cpf, data_nascimento, telefone, tipo_usuario, senha) VALUES
+('João Silva', '12345678901', '1990-05-15', '11987654321', 'FUNCIONARIO', 'senha123'),
+('Maria Souza', '98765432100', '1985-11-20', '21987654321', 'CLIENTE', 'senha456'),
+('Pedro Oliveira', '11122233344', '2000-03-25', '31987654321', 'CLIENTE', 'senha789');
+
+INSERT INTO funcionario (codigo_funcionario, cargo, id_usuario) VALUES
+('FUNC001', 'Gerente', 1);
+
+INSERT INTO cliente (id_usuario) VALUES
+(2),
+(3);
+
+INSERT INTO endereco (cep, local, numero_casa, bairro, cidade, estado, id_usuario) VALUES
+('01001-000', 'Rua A', 123, 'Centro', 'São Paulo', 'SP', 2),
+('02002-000', 'Rua B', 456, 'Vila Nova', 'Rio de Janeiro', 'RJ', 3);
+
+INSERT INTO conta (numero_conta, agencia, saldo, tipo_conta, id_cliente) VALUES
+('123456', '001', 1500.50, 'CORRENTE', 1),
+('789012', '002', 2500.75, 'POUPANCA', 2);
+
+INSERT INTO conta_corrente (limite, data_vencimento, id_conta) VALUES
+(1000.00, '2024-12-31', 1);
+
+INSERT INTO conta_poupanca (taxa_rendimento, id_conta) VALUES
+(0.05, 2);
+
+INSERT INTO transacao (tipo_transacao, valor, id_conta) VALUES
+('DEPOSITO', 500.00, 1),
+('SAQUE', 200.00, 2),
+('TRANSFERENCIA', 300.00, 1);
+
+INSERT INTO relatorio (tipo_relatorio, conteudo, id_funcionario) VALUES
+('Financeiro', 'Relatório de desempenho financeiro do mês.', 1),
+('Clientes', 'Relatório de novos clientes cadastrados.', 1);
+
+INSERT INTO funcionario (codigo_funcionario, cargo, id_usuario)
+VALUES ('ADMIN001', 'Administrador', LAST_INSERT_ID());
+
+
+ALTER TABLE usuario
+MODIFY COLUMN tipo_usuario ENUM('FUNCIONARIO', 'CLIENTE', 'ADMINISTRADOR');
+
+SELECT cl.id_cliente, u.nome, u.cpf
+FROM cliente cl
+JOIN usuario u ON cl.id_usuario = u.id_usuario;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
